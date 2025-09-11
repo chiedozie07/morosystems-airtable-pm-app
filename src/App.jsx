@@ -9,33 +9,37 @@ function App() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // define the counts for each status
+  const statusCounts = projects.reduce((acc, project) => {
+    const status = project['Project Status'] || 'Unknown';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+
   // fetch projects from Airtable on component mount
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true);
-      const projectData = await getProjects();
-      setProjects(projectData);
-      setLoading(false);
+      try {
+        const projectData = await getProjects();
+        // Check if the fetched data is different from the current state
+        if (JSON.stringify(projectData) !== JSON.stringify(projects)) {
+          setProjects(projectData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        // only set loading to false after the initial load
+        if (loading) {
+          setLoading(false);
+        }
+      }
     };
 
-    fetchProjects(); // initial fetch
+    fetchProjects(); // Initial fetch
     const intervalId = setInterval(fetchProjects, 15000); // poll every 15 seconds
-    return () => clearInterval(intervalId); // ceanup on component unmount
-  }, []);
 
-  // function to determine the color based on status
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Blocked':
-        return 'bg-red-500';
-      case 'Done':
-        return 'bg-green-500';
-      case 'In Progress':
-        return 'bg-yellow-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+    return () => clearInterval(intervalId); // cleanup on component unmount
+  }, [projects, loading]); // added dependencies to re-run effect if projects or loading changes
 
   // show loading state
   if (loading) {
@@ -46,17 +50,33 @@ function App() {
     );
   }
 
-
   return (
-    <div className="container mx-auto p-4">
-      {/* App Header */}
+    <div className="bg-gray-100 min-h-screen font-sans">
       <Header />
-      <h1 className="text-3xl font-bold mt-6 mb-6">Projects Overview</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
-        <ProjectsList key={project.id} projects={projects} />
-        ))}
-      </div>
+      <main className="container mx-auto py-8 px-4">
+        {/* summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Total Projects</h3>
+            <p className="text-3xl font-bold text-gray-800">{projects.length}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Done</h3>
+            <p className="text-3xl font-bold text-green-500">{statusCounts['Done'] || 0}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">In Progress</h3>
+            <p className="text-3xl font-bold text-yellow-500">{statusCounts['In Progress'] || 0}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Blocked</h3>
+            <p className="text-3xl font-bold text-red-500">{statusCounts['Blocked'] || 0}</p>
+          </div>
+        </div>
+
+        {/* the new reusable component */}
+        <ProjectsList projects={projects} />
+      </main>
     </div>
   );
 }
