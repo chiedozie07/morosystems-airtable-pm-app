@@ -6,8 +6,8 @@ import { getProjects } from './AirtableApi';
 function App() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Fetch projects from Airtable on component mount
+
+  // fetch projects from Airtable on component mount
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
@@ -15,10 +15,13 @@ function App() {
       setProjects(projectData);
       setLoading(false);
     };
-    fetchProjects();
+
+    fetchProjects(); // initial fetch
+    const intervalId = setInterval(fetchProjects, 15000); // poll every 15 seconds
+    return () => clearInterval(intervalId); // ceanup on component unmount
   }, []);
 
-  // Function to determine the color based on status
+  // function to determine the color based on status
   const getStatusColor = (status) => {
     switch (status) {
       case 'Blocked':
@@ -32,7 +35,14 @@ function App() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  // show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <h2 className="text-2xl font-semibold text-gray-700 animate-pulse">Loading Projects...</h2>
+      </div>
+    );
+  }
 
 
   return (
@@ -44,7 +54,7 @@ function App() {
             <h2 className="text-xl font-semibold">{project['Project Name']}</h2>
             <p>Status: {project['Project Status']}</p>
             <p>Assignee: {project['Assignee Full Name']}</p>
-            {/* Display all other fields */}
+            {/* display all other fields */}
           </div>
         ))}
       </div>
