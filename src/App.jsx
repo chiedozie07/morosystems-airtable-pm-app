@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import { getProjects } from './AirtableApi';
+import Header from './components/Header';
+import ProjectsList from './components/ProjectsList';
 
 
 function App() {
@@ -47,19 +49,16 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Projects Dashboard</h1>
+      {/* App Header */}
+      <Header />
+      <h1 className="text-3xl font-bold mt-6 mb-6">Projects Overview</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <div key={project.id} className={`p-6 rounded-lg shadow-md text-white ${getStatusColor(project['Project Status'])}`}>
-            <h2 className="text-xl font-semibold">{project['Project Name']}</h2>
-            <p>Status: {project['Project Status']}</p>
-            <p>Assignee: {project['Assignee Full Name']}</p>
-            {/* display all other fields */}
-          </div>
+        <ProjectsList key={project.id} projects={projects} />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export default App;
