@@ -4,8 +4,7 @@ import { getProjects } from './AirtableApi';
 import Header from './components/Header';
 import ProjectsList from './components/ProjectsList';
 
-
-function App() {
+const App = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,32 +15,32 @@ function App() {
     return acc;
   }, {});
 
-  // fetch projects from Airtable on component mount
+  // fetch projects from Airtable on component mount and poll for updates
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const projectData = await getProjects();
-        // Check if the fetched data is different from the current state
-        if (JSON.stringify(projectData) !== JSON.stringify(projects)) {
+      // update the state with the fetched data only update if the data is different
+        if (projectData) {
           setProjects(projectData);
         }
       } catch (error) {
         console.error("Failed to fetch projects:", error);
       } finally {
-        // only set loading to false after the initial load
-        if (loading) {
-          setLoading(false);
-        }
+        // hidden loading screen after the initial fetch, regardless of success.
+        setLoading(false);
       }
     };
+    fetchProjects(); // initial fetch
+    const intervalId = setInterval(fetchProjects, 15000);
+    return () => clearInterval(intervalId);
+  }, []); 
 
-    fetchProjects(); // Initial fetch
-    const intervalId = setInterval(fetchProjects, 15000); // poll every 15 seconds
+  useEffect(() => {
+    console.log("DEBUG: Fetched projects ===>", projects);
+  }, [projects]);
 
-    return () => clearInterval(intervalId); // cleanup on component unmount
-  }, [projects, loading]); // added dependencies to re-run effect if projects or loading changes
-
-  // show loading state
+  // show loading state only on initial render
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -54,7 +53,7 @@ function App() {
     <div className="bg-gray-100 min-h-screen font-sans">
       <Header />
       <main className="container mx-auto py-8 px-4">
-        {/* summary Cards */}
+        {/* summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-gray-500 font-medium">Total Projects</h3>
@@ -73,8 +72,7 @@ function App() {
             <p className="text-3xl font-bold text-red-500">{statusCounts['Blocked'] || 0}</p>
           </div>
         </div>
-
-        {/* the new reusable component */}
+        {/* projects card */}
         <ProjectsList projects={projects} />
       </main>
     </div>
