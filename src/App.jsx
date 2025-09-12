@@ -1,41 +1,46 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import { getProjects } from './AirtableApi';
+import Header from './components/Header';
+import ProjectsList from './components/ProjectsList';
 
-
-function App() {
+const App = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // fetch projects from Airtable on component mount
+  // define the counts for each status
+  const statusCounts = projects.reduce((acc, project) => {
+    const status = project['Project Status'] || 'Unknown';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+
+  // fetch projects from Airtable on component mount and poll for updates
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true);
-      const projectData = await getProjects();
-      setProjects(projectData);
-      setLoading(false);
+      try {
+        const projectData = await getProjects();
+      // update the state with the fetched data only update if the data is different
+        if (projectData) {
+          setProjects(projectData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        // hidden loading screen after the initial fetch, regardless of success.
+        setLoading(false);
+      }
     };
-
     fetchProjects(); // initial fetch
-    const intervalId = setInterval(fetchProjects, 15000); // poll every 15 seconds
-    return () => clearInterval(intervalId); // ceanup on component unmount
-  }, []);
+    const intervalId = setInterval(fetchProjects, 15000);
+    return () => clearInterval(intervalId);
+  }, []); 
 
-  // function to determine the color based on status
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Blocked':
-        return 'bg-red-500';
-      case 'Done':
-        return 'bg-green-500';
-      case 'In Progress':
-        return 'bg-yellow-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+  useEffect(() => {
+    console.log("DEBUG: Fetched projects ===>", projects);
+  }, [projects]);
 
-  // show loading state
+  // show loading state only on initial render
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -44,22 +49,34 @@ function App() {
     );
   }
 
-
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Projects Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
-          <div key={project.id} className={`p-6 rounded-lg shadow-md text-white ${getStatusColor(project['Project Status'])}`}>
-            <h2 className="text-xl font-semibold">{project['Project Name']}</h2>
-            <p>Status: {project['Project Status']}</p>
-            <p>Assignee: {project['Assignee Full Name']}</p>
-            {/* display all other fields */}
+    <div className="bg-gray-100 min-h-screen font-sans">
+      <Header />
+      <main className="container mx-auto py-8 px-4">
+        {/* summary cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Total Projects</h3>
+            <p className="text-3xl font-bold text-gray-800">{projects.length}</p>
           </div>
-        ))}
-      </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Done</h3>
+            <p className="text-3xl font-bold text-green-500">{statusCounts['Done'] || 0}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">In Progress</h3>
+            <p className="text-3xl font-bold text-yellow-500">{statusCounts['In Progress'] || 0}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-gray-500 font-medium">Blocked</h3>
+            <p className="text-3xl font-bold text-red-500">{statusCounts['Blocked'] || 0}</p>
+          </div>
+        </div>
+        {/* projects card */}
+        <ProjectsList projects={projects} />
+      </main>
     </div>
-  )
+  );
 }
 
 export default App;
