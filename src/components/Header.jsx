@@ -2,19 +2,19 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="bg-white shadow-sm p-4 sticky top-0 z-50">
+    <header className="bg-[#F7F7F7] shadow-sm p-4 sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
-        {/* Logo and App Title */}
+        {/* Logo and App Title bg[#f9fafb]*/}
         <div className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-blue-600">
+          <span className="text-2xl font-bold text-blue-600">
             {/* Replace with a logo image or keep a clean text logo */}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2l-5.5 9h11z" />
               <path d="M12 22l-5.5-9h11z" />
               <circle cx="12" cy="12" r="10" />
             </svg>
           </span>
-          <h1 className="text-2xl font-bold text-gray-800">Project Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-700">Project Dashboard</h1>
         </div>
 
         {/* User Profile and Notifications (simulated) */}
