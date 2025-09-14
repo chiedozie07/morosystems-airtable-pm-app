@@ -52,7 +52,7 @@ const App = () => {
         {/* summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 mt-6">
           <div className="bg-[#f9f9f9] p-6 rounded-lg shadow-md text-center bg-">
-            <h3 className="text-gray-700 font-medium">Total Projects</h3>
+            <h3 className="text-gray-600 font-medium">Total Projects</h3>
             <p className="text-3xl font-bold text-gray-700">{projects.length}</p>
           </div>
           <div className="bg-[#f9f9f9] p-6 rounded-lg shadow-md text-center">
