@@ -10,6 +10,9 @@ This is a custom React web application built for the MoroSystems for No Code/Low
 
 4. Responsive Design: The layout is fully responsive and optimized for a seamless experience on both desktop and mobile devices.
 
+## Live Application
+[👉🏻 View Live Demo](https://morosystems-assessment-chiedozie.netlify.app/)
+
 ## Airtable Setup
 This application requires a connected Airtable base to function. The project is designed to integrate with the "Planning Base" configured as part of the technical assessment.
 
