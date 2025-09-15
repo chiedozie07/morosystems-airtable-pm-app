@@ -14,7 +14,7 @@ const Header = () => {
               <circle cx="12" cy="12" r="10" />
             </svg>
           </span>
-          <h1 className="text-2xl font-bold text-gray-700">Project Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-700">MoroSystems</h1>
         </div>
 
         {/* User Profile and Notifications (simulated) */}
