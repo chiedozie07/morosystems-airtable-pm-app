@@ -45,9 +45,17 @@ const ProjectsList = ({ projects }) => {
           }
 
           // safely access fields, handling array values and fallbacks
-          const projectStatus = project['Project Status']?.[0] || 'N/A';
-          const assigneeName = project['Full Name (from Assignee)']?.[0] || 'N/A';
-          const reporterName = project['Full Name (from Reporter)']?.[0] || 'N/A';
+          const projectStatus = Array.isArray(project['Project Status'])
+            ? project['Project Status']?.[0] || 'N/A'
+            : project['Project Status'] || 'N/A';
+
+          const assigneeName = Array.isArray(project['Full Name (from Assignee)'])
+            ? project['Full Name (from Assignee)']?.[0] || 'N/A'
+            : project['Full Name (from Assignee)'] || 'N/A';
+
+          const reporterName = Array.isArray(project['Full Name (from Reporter)'])
+            ? project['Full Name (from Reporter)']?.[0] || 'N/A'
+            : project['Full Name (from Reporter)'] || 'N/A';
           // const description = project['Project Description'] || 'N/A';
           // const ownerName = project['Owner']?.[0] || 'N/A';
 
@@ -73,11 +81,11 @@ const ProjectsList = ({ projects }) => {
               </div>
 
               <div className="text-gray-700 text-sm space-y-2 hover:text-white">
-                {/* <p><strong>Owner:</strong> {ownerName}</p> */}
                 <p><strong>Start Date:</strong> {project['Start Date'] || 'N/A'}</p>
                 <p><strong>End Date:</strong> {project['End Date'] || 'N/A'}</p>
                 <p><strong>Assignee:</strong> {assigneeName || 'N/A'}</p>
                 <p><strong>Reporter:</strong> {reporterName || 'N/A'}</p>
+                {/* <p><strong>Owner:</strong> {ownerName}</p> */}
               </div>
             </div>
           );
